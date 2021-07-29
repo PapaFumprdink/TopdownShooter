@@ -6,6 +6,7 @@ public sealed class PlayerWeapon : MonoBehaviour
 {
     [SerializeField] private GameObject m_ProjectilePrefab;
     [SerializeField] private int m_ProjectilesPerShot;
+    [SerializeField] private float m_Spread;
     [SerializeField] private float m_Spray;
 
     [Space]
@@ -44,8 +45,9 @@ public sealed class PlayerWeapon : MonoBehaviour
             {
                 for (int i = 0; i < m_ProjectilesPerShot; i++)
                 {
-                    float spray = (i / (m_ProjectilesPerShot - 1f)) * m_Spray - m_Spray / 2f;
-                    GameObject projectileInstance = Instantiate(m_ProjectilePrefab, m_Muzzle.position, m_Muzzle.rotation * Quaternion.Euler(0f, 0f, spray));
+                    float rotationOffset = Random.Range(m_Spray / -2f, m_Spray / 2f);
+                    if (m_ProjectilesPerShot > 1) rotationOffset += (i / (m_ProjectilesPerShot - 1f)) * m_Spread - m_Spread / 2f;
+                    GameObject projectileInstance = Instantiate(m_ProjectilePrefab, m_Muzzle.position, m_Muzzle.rotation * Quaternion.Euler(0f, 0f, rotationOffset));
                     
                     if (projectileInstance.TryGetComponent(out Projectile projectile))
                     {
