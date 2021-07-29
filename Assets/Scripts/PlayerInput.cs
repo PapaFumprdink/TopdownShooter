@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 [DisallowMultipleComponent]
 public sealed class PlayerInput : MonoBehaviour
 {
-    [SerializeField] private bool m_UseGamepad;
+    private const float KeyDeadzone = 0.1f;
     [SerializeField] private float m_CursorDistance;
 
     private PlayerControls m_ControlAsset;
@@ -15,7 +15,7 @@ public sealed class PlayerInput : MonoBehaviour
     {
         get
         {
-            if (m_UseGamepad)
+            if (Gamepad.current != null ? Gamepad.current.wasUpdatedThisFrame : false)
             {
                 return m_ControlAsset.Player.LookDirection.ReadValue<Vector2>();
             }
@@ -26,9 +26,22 @@ public sealed class PlayerInput : MonoBehaviour
             }
         }
     }
+    public bool IsFiring => m_ControlAsset.Player.Fire.ReadValue<float>() > KeyDeadzone;
+    public bool FiredThisFrame => m_ControlAsset.Player.Fire.triggered;
+    public bool IsReloading => m_ControlAsset.Player.Reload.ReadValue<float>() > KeyDeadzone;
 
     private void Awake()
     {
         m_ControlAsset = new PlayerControls();
+    }
+
+    private void OnEnable()
+    {
+        m_ControlAsset.Enable();
+    }
+
+    private void OnDisable()
+    {
+        m_ControlAsset.Disable();
     }
 }
